@@ -12,7 +12,8 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/shirtOrders', { useNewUrlParser: true, useUnifiedTopology: true })
+const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://sud:DFbmEZc9AwEPZPMd@cluster0.yp7jp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log("Connected to MongoDB"))
     .catch(err => console.log(err));
 
