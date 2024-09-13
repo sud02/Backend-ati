@@ -89,6 +89,7 @@ app.post('/login', async (req, res) => {
         console.error('Error during login:', err);
         res.status(500).json({ message: err.message });
     }
+    res.status(404).send('This route is not available. Please send a POST request.');
 });
 
 // Shirt Schema
