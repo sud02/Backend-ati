@@ -38,11 +38,25 @@ app.post('/signup', async (req, res) => {
     console.log('Signup request body:', req.body);
 
     try {
+        // Check if the user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
+        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create a new user
         const newUser = new User({ firstName, lastName, email, password: hashedPassword });
+
+        // Save the user to the database
         const savedUser = await newUser.save();
+
+        // Respond with the saved user
         res.status(201).json(savedUser);
     } catch (err) {
+        console.error('Error during signup:', err);
         res.status(400).json({ message: err.message });
     }
 });
@@ -76,6 +90,7 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
+
 // Shirt Schema
 const shirtSchema = new mongoose.Schema({
     name: {
@@ -118,50 +133,6 @@ app.post('/shirts', async (req, res) => {
         res.status(201).json(savedShirt);
     } catch (err) {
         res.status(400).json({ message: err.message });
-    }
-});
-
-// Get shirt by ID
-app.get('/shirts/:id', async (req, res) => {
-    try {
-        const shirt = await Shirt.findById(req.params.id);
-        if (!shirt) {
-            return res.status(404).json({ message: 'Shirt not found' });
-        }
-        res.json(shirt);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Update a shirt by ID
-app.patch('/shirts/:id', async (req, res) => {
-    try {
-        const { name, size } = req.body;
-        const updatedShirt = await Shirt.findByIdAndUpdate(
-            req.params.id,
-            { name, size },
-            { new: true, runValidators: true }
-        );
-        if (!updatedShirt) {
-            return res.status(404).json({ message: 'Shirt not found' });
-        }
-        res.json(updatedShirt);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-});
-
-// Delete a shirt by ID
-app.delete('/shirts/:id', async (req, res) => {
-    try {
-        const shirt = await Shirt.findByIdAndDelete(req.params.id);
-        if (!shirt) {
-            return res.status(404).json({ message: 'Shirt not found' });
-        }
-        res.json({ message: 'Shirt deleted' });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
     }
 });
 
