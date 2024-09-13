@@ -1,9 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcryptjs'); // Update this line
+const bcrypt = require('bcryptjs'); // Use bcryptjs to avoid native module issues
 const jwt = require('jsonwebtoken');
-const cors = require('cors'); // Add this line
+const cors = require('cors'); // Ensure cors is required
 
 // Initialize the app
 const app = express();
@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors()); // Add this line
+app.use(cors()); // Use cors middleware
 
 // MongoDB connection
 const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://sud:DFbmEZc9AwEPZPMd@cluster0.yp7jp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
@@ -34,6 +34,9 @@ const User = mongoose.model('User', userSchema);
 app.post('/signup', async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
 
+    // Debugging statements
+    console.log('Signup request body:', req.body);
+
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({ firstName, lastName, email, password: hashedPassword });
@@ -47,6 +50,9 @@ app.post('/signup', async (req, res) => {
 // Login route
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
+
+    // Debugging statements
+    console.log('Login request body:', req.body);
 
     try {
         const user = await User.findOne({ email });
