@@ -28,26 +28,25 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
-// Signup route
 app.post('/signup', async (req, res) => {
-  const { email, password, firstName, lastName } = req.body;
-
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+    const { email, password, firstName, lastName } = req.body;
+  
+    try {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: 'User already exists' });
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = new User({ email, password: hashedPassword, firstName, lastName });
+      await newUser.save();
+  
+      res.status(201).json({ message: 'User created successfully' });
+    } catch (err) {
+      console.error('Error during signup:', err); // Log the error to the console
+      res.status(500).json({ message: 'Server error', error: err.message }); // Send the error message in the response
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ email, password: hashedPassword, firstName, lastName });
-    await newUser.save();
-
-    res.status(201).json({ message: 'User created successfully' });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
+  });
 // Login route
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
