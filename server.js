@@ -4,10 +4,13 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-require('dotenv').config();
+require('dotenv').config(); // Load environment variables from .env file
 
 const app = express();
-const PORT = process.env.PORT || 9000;
+const PORT = process.env.PORT || 9006; // Changed port to 9006
+
+// Log the MongoDB URI to verify it's being read correctly
+console.log('MongoDB URI:', process.env.MONGODB_URI);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {
@@ -58,7 +61,7 @@ app.post('/signup', async (req, res) => {
     res.status(201).json({ message: 'User created successfully' });
   } catch (err) {
     console.error('Error during signup:', err); // Log the error to the console
-    res.status(500).json({ message: 'Server error' }); // Avoid sending detailed error messages
+    res.status(500).json({ message: 'Server error', error: err.message }); // Send the error message in the response
   }
 });
 
@@ -81,7 +84,6 @@ app.post('/login', async (req, res) => {
 
     res.status(200).json({ token, firstName: user.firstName, lastName: user.lastName });
   } catch (err) {
-    console.error('Error during login:', err); 
     res.status(500).json({ message: 'Server error' });
   }
 });
