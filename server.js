@@ -4,7 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-require('dotenv').config(); // Load environment variables from .env file
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 9000;
@@ -46,7 +46,7 @@ app.post('/signup', async (req, res) => {
   const { email, password, firstName, lastName } = req.body;
 
   try {
-    const existingUser = await User.findOne({ email: mongoose.Types.ObjectId(email) });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
@@ -58,7 +58,7 @@ app.post('/signup', async (req, res) => {
     res.status(201).json({ message: 'User created successfully' });
   } catch (err) {
     console.error('Error during signup:', err); // Log the error to the console
-    res.status(500).json({ message: 'Server error', error: err.message }); // Send the error message in the response
+    res.status(500).json({ message: 'Server error' }); // Avoid sending detailed error messages
   }
 });
 
@@ -67,7 +67,7 @@ app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email: mongoose.Types.ObjectId(email) });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
@@ -81,6 +81,7 @@ app.post('/login', async (req, res) => {
 
     res.status(200).json({ token, firstName: user.firstName, lastName: user.lastName });
   } catch (err) {
+    console.error('Error during login:', err); 
     res.status(500).json({ message: 'Server error' });
   }
 });
